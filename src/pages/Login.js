@@ -35,7 +35,7 @@ const handleLogin = async () => {
 
     return (
         <div>
-            <h2>התחבר</h2>
+            <h2>התחברות</h2>
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"
