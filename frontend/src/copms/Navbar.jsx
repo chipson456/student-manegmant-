@@ -11,7 +11,7 @@ const NavBar = () => {
           <Nav className="me-auto">
             <Nav.Link href="#">בית</Nav.Link>
             <Nav.Link href="#">עלינו</Nav.Link>
-            <Nav.Link href="#">יצddירת קשר</Nav.Link>
+            <Nav.Link href="#">יצירת קשר</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>
