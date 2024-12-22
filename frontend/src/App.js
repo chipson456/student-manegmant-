@@ -6,6 +6,7 @@ function App() {
   return (
     <div>
       <Login />
+      <h2>נדב</h2>
     </div>
   );
 }
