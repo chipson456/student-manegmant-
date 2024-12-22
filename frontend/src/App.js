@@ -1,9 +1,12 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
+import Login from "./copms/Login";
 
 function App() {
   return (
-<div>helgghglow</div>
+    <div>
+      <Login />
+    </div>
   );
 }
 
