@@ -1,97 +1,51 @@
-const express = require('express');
-const env = require('dotenv').config();
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const fs = require('fs');
-const path = require('path');
-const mongoose = require('mongoose');
-const { MongoClient } = require('mongodb');
+import express from 'express'; // ייבוא ספריית express ליצירת אפליקציה
+import cors from 'cors'; // ייבוא CORS לאפשר תקשורת בין דומיינים
+import bodyParser from 'body-parser'; // ייבוא body-parser לניתוח תוכן בקשות HTTP
+import fs from 'fs'; // ייבוא fs לעבודה עם מערכת קבצים
+import path from 'path'; // ייבוא path לעבודה עם נתיבים
+import { fileURLToPath } from 'url'; // ייבוא fileURLToPath כדי לתמוך ב-__dirname
+import mongoose from 'mongoose'; // ייבוא mongoose לחיבור למסד הנתונים
+import authRoutes from './routes/auth.js'; // מסלולים עבור אימות
+import uploadRoutes from './routes/upload.js'; // מסלולים עבור העלאת קבצים
+import dotenv from 'dotenv';
+dotenv.config();
 
-const authRoutes = require('./routes/auth');
-const uploadRoutes = require('./routes/upload');
-const app = express();
 
-const mongoURI = process.env.MONGO_URI;
+// יצירת __dirname מותאם ל-ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// Enhanced Connection Options
-const connectionOptions = {
-    serverSelectionTimeoutMS: 30000,
-    socketTimeoutMS: 45000,
-    connectTimeoutMS: 30000,
-    retryWrites: true,
-    w: 'majority',
-    ssl: true,
-    tlsAllowInvalidCertificates: false,
-    tlsAllowInvalidHostnames: false
-};
+const app = express(); // יצירת אפליקציית Express
 
-async function connectToMongoDB() {
-    try {
-        // Mongoose Connection
-        await mongoose.connect(mongoURI, connectionOptions);
-        console.log('Mongoose Connected Successfully');
+// חיבור ל-MongoDB
+const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/test'; // הגדרת URI למסד הנתונים
 
-        // Direct MongoDB Client Connection
-        const client = new MongoClient(mongoURI, connectionOptions);
-        await client.connect();
-        console.log('Direct MongoDB Client Connection Successful');
-        await client.close();
-    } catch (error) {
-        console.error('Detailed MongoDB Connection Error:', {
-            name: error.name,
-            message: error.message,
-            code: error.code,
-            stack: error.stack
-        });
-
-        // Implement exponential backoff for reconnection
-        setTimeout(connectToMongoDB, 5000);
-    }
-}
-
-// Connection Event Listeners
-mongoose.connection.on('connected', () => {
-    console.log('Mongoose Connected Successfully');
+mongoose.connect(mongoURI, {
+  serverSelectionTimeoutMS: 5000 // מגבלת זמן לחיבור
+}).then(() => {
+  console.log('Connected to MongoDB');
+}).catch((err) => {
+  console.error('Failed to connect to MongoDB:', err.message);
 });
 
-mongoose.connection.on('error', (err) => {
-    console.error('Mongoose Connection Error:', err);
-});
-
-mongoose.connection.on('disconnected', () => {
-    console.log('Mongoose Disconnected');
-    connectToMongoDB();
-});
-
-// Initial Connection Attempt
-connectToMongoDB();// Create uploads directory if it doesn't exist
+// יצירת תיקיית uploads אם אינה קיימת
 const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)){
-    fs.mkdirSync(uploadsDir);
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
 }
 
+// Middleware
 app.use(cors());
 app.use(bodyParser.json());
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(uploadsDir)); // הפיכת תיקיית uploads לציבורית
 
+// Routes
 app.use('/auth', authRoutes);
 app.use('/api/upload', uploadRoutes);
 
+// הפעלת השרת
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-// Error handler middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack); // Log the error for debugging
-
-    const statusCode = err.status || 500;
-    const message = err.message || 'Internal Server Error';
-
-    res.status(statusCode).json({
-        success: false,
-        error: {
-            message: message,
-            stack: process.env.NODE_ENV === 'production' ? null : err.stack,
-        },
-    });
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
+
