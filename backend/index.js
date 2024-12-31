@@ -1,28 +1,70 @@
 const express = require('express');
-const env= require('dotenv').config();
+const env = require('dotenv').config();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
+const mongoose = require('mongoose');
+const { MongoClient } = require('mongodb');
+
 const authRoutes = require('./routes/auth');
 const uploadRoutes = require('./routes/upload');
 const app = express();
 
-
-
-const mongoose = require('mongoose');
 const mongoURI = process.env.MONGO_URI;
 
+// Enhanced Connection Options
+const connectionOptions = {
+    serverSelectionTimeoutMS: 30000,
+    socketTimeoutMS: 45000,
+    connectTimeoutMS: 30000,
+    retryWrites: true,
+    w: 'majority',
+    ssl: true,
+    tlsAllowInvalidCertificates: false,
+    tlsAllowInvalidHostnames: false
+};
 
-mongoose.connect(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-    .then(() => console.log('Connected to database successfully'))
-    .catch((err) => console.log('Error connecting to MongoDB:', err));
+async function connectToMongoDB() {
+    try {
+        // Mongoose Connection
+        await mongoose.connect(mongoURI, connectionOptions);
+        console.log('Mongoose Connected Successfully');
 
+        // Direct MongoDB Client Connection
+        const client = new MongoClient(mongoURI, connectionOptions);
+        await client.connect();
+        console.log('Direct MongoDB Client Connection Successful');
+        await client.close();
+    } catch (error) {
+        console.error('Detailed MongoDB Connection Error:', {
+            name: error.name,
+            message: error.message,
+            code: error.code,
+            stack: error.stack
+        });
 
-// Create uploads directory if it doesn't exist
+        // Implement exponential backoff for reconnection
+        setTimeout(connectToMongoDB, 5000);
+    }
+}
+
+// Connection Event Listeners
+mongoose.connection.on('connected', () => {
+    console.log('Mongoose Connected Successfully');
+});
+
+mongoose.connection.on('error', (err) => {
+    console.error('Mongoose Connection Error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+    console.log('Mongoose Disconnected');
+    connectToMongoDB();
+});
+
+// Initial Connection Attempt
+connectToMongoDB();// Create uploads directory if it doesn't exist
 const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)){
     fs.mkdirSync(uploadsDir);
@@ -42,7 +84,6 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 app.use((err, req, res, next) => {
     console.error(err.stack); // Log the error for debugging
 
-    // Customize the response based on the error
     const statusCode = err.status || 500;
     const message = err.message || 'Internal Server Error';
 
@@ -50,7 +91,7 @@ app.use((err, req, res, next) => {
         success: false,
         error: {
             message: message,
-            stack: process.env.NODE_ENV === 'production' ? null : err.stack, // Show stack trace only in non-production environments
+            stack: process.env.NODE_ENV === 'production' ? null : err.stack,
         },
     });
 });

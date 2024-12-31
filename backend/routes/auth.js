@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 
-
 router.get('/', (req, res) => {
     res.status(200).send('Server is running');
 });
@@ -12,7 +11,8 @@ router.post('/login', (req, res) => {
 
     // Example: hardcoded users
     const users = [
-        { username: 'admin', password: 'admin123' },
+        { username: 'admin', password: 'admin123' }, // Ensure this matches the credentials used in Login.jsx
+        { username: 'user', password: 'user123' },   // Add more users if needed
     ];
 
     const user = users.find((u) => u.username === username && u.password === password);
@@ -23,5 +23,5 @@ router.post('/login', (req, res) => {
     }
 });
 
-
 module.exports = router;
+
