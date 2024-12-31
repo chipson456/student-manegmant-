@@ -1,6 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
 
 const Login = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const response = await fetch("http://localhost:5000/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+
+      const data = await response.json();
+      // Handle successful login (e.g., store token, redirect)
+      console.log(data);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   return (
     <div className="d-flex justify-content-center align-items-center vh-100">
       <div
