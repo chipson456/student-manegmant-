@@ -40,7 +40,7 @@ const StudentProjects = () => {
     <Container className="mt-5">
       <h2 className="text-center mb-5 display-4">הפרויקטים שלי</h2>
       <Row className="gy-4">
-        {["פרויקט ראשון", "פרויקט שני", "פרויקט גמר"].map((title, index) => (
+        {["הצעת פרויקט", "ספר פרויקט", "פרויקט גמר"].map((title, index) => (
           <Col md={4} key={index}>
             <Card
               className={`shadow-lg ${isEditable[index] ? "clickable" : "disabled"}`}
