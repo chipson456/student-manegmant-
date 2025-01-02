@@ -1,12 +1,11 @@
 import React from "react";
-import { Container, Navbar, Button, Row, Col } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
+import AccessibilityModal from "./AccessibilityModal"; // ייבוא הקומפוננטה
 
 const HomePage = () => {
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#f7f9fc" }}>
-      
-
       {/* Main Section */}
       <Container className="text-center mt-5">
         <h1 className="display-4 fw-bold text-primary">ברוכים הבאים!</h1>
@@ -50,6 +49,8 @@ const HomePage = () => {
                 <a href="#" className="text-decoration-none text-light mx-2">
                   פרטיות
                 </a>
+                |
+                <AccessibilityModal /> {/* הצהרת נגישות */}
               </p>
             </Col>
           </Row>
