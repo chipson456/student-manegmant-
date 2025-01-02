@@ -1,67 +1,66 @@
-import express from 'express'; // ייבוא ספריית express לניהול מסלולים.
-import multer from 'multer'; // ייבוא multer לטיפול בהעלאת קבצים.
-import path from 'path'; // ייבוא path לעבודה עם נתיבי קבצים.
+import express from 'express';
+import multer from 'multer';
+import path from 'path';
 import { fileURLToPath } from 'url';
 
-const router = express.Router(); // יצירת אובייקט router לניהול מסלולים.
+const router = express.Router();
 
-const __filename = fileURLToPath(import.meta.url); // מייצר את שם הקובץ המלא
-const __dirname = path.dirname(__filename); // מייצר את נתיב התיקיה
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const uploadsDir = path.join(__dirname, 'uploads'); // יצירת נתיב לתיקיית uploads
-const storage = multer.diskStorage({ // הגדרת אחסון קבצים בשרת.
-    destination: (req, file, cb) => { // יעד שמירת הקובץ.
-        cb(null, uploadsDir); // שימוש בתיקיית uploads.
+const uploadsDir = path.join(__dirname, 'uploads');
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadsDir);
     },
-    filename: (req, file, cb) => { // שם ייחודי לקובץ שמועלה.
-        cb(null, Date.now() + '-' + file.originalname); // הוספת timestamp לשם הקובץ המקורי.
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname);
     }
 });
 
-const fileFilter = (req, file, cb) => { // פילטר להגבלת סוגי הקבצים המועלים.
-    if (file.fieldname === 'image') { // בדיקה אם מדובר בקובץ מסוג תמונה.
-        if (!file.mimetype.startsWith('image/')) { // אם סוג הקובץ אינו תמונה.
-            return cb(new Error('Only images are allowed!'), false); // החזרת שגיאה.
+const fileFilter = (req, file, cb) => {
+    if (file.fieldname === 'image') {
+        if (!file.mimetype.startsWith('image/')) {
+            return cb(new Error('Only images are allowed!'), false);
         }
     }
-    cb(null, true); // אישור העלאת הקובץ אם התקבל תקין.
+    cb(null, true);
 };
 
-const upload = multer({  // הגדרת multer עם אחסון ופילטרים.
-    storage: storage, // שימוש בהגדרות אחסון.
-    fileFilter: fileFilter, // שימוש בפילטרים לקבצים.
+const upload = multer({
+    storage: storage,
+    fileFilter: fileFilter,
     limits: {
-        fileSize: 5 * 1024 * 1024 // מגבלת גודל קובץ: 5MB.
+        fileSize: 5 * 1024 * 1024
     }
 });
 
-router.post('/file', upload.single('file'), (req, res) => { // מסלול להעלאת קובץ.
+router.post('/file', upload.single('file'), (req, res) => {
     try {
-        if (!req.file) { // אם לא הועלה קובץ.
-            return res.status(400).json({ error: 'No file uploaded' }); // החזרת שגיאה.
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
         }
-        res.json({  // תגובה על הצלחה.
+        res.json({
             message: 'File uploaded successfully',
-            filename: req.file.filename // שם הקובץ שהועלה.
+            filename: req.file.filename
         });
-    } catch (error) { // טיפול בשגיאות.
-        res.status(500).json({ error: error.message }); // החזרת שגיאה.
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 });
 
-router.post('/image', upload.single('image'), (req, res) => { // מסלול להעלאת תמונה.
+router.post('/image', upload.single('image'), (req, res) => {
     try {
-        if (!req.file) { // אם לא הועלתה תמונה.
-            return res.status(400).json({ error: 'No image uploaded' }); // החזרת שגיאה.
+        if (!req.file) {
+            return res.status(400).json({ error: 'No image uploaded' });
         }
-        res.json({  // תגובה על הצלחה.
+        res.json({
             message: 'Image uploaded successfully',
-            filename: req.file.filename // שם התמונה שהועלתה.
+            filename: req.file.filename
         });
-    } catch (error) { // טיפול בשגיאות.
-        res.status(500).json({ error: error.message }); // החזרת שגיאה.
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 });
 
-export default router; // ייצוא ה-router לשימוש בקובץ אחר.
-
+export default router;
