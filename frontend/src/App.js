@@ -5,7 +5,7 @@ import Login from "./copms/Login";
 import ForgotPassword from "./copms/ForgotPassword";
 import StudentProjects from "./copms/StudentProjects";
 import HomePage from "./copms/HomePage";
-import AccessibilityModal from "./copms/AccessibilityModal"; 
+
 
 function App() {
   return (

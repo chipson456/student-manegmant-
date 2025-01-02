@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -15,24 +16,23 @@ const Login = () => {
     setSuccess("");
 
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
+      const response = await axios.post("http://localhost:5000/auth/login", {
+        username,
+        password,
       });
 
-      if (response.ok) {
+      if (response.status === 200) {
         setSuccess("Login successful!");
         setTimeout(() => {
           navigate("/student-projects"); // ניתוב לעמוד הפרויקטים
         }, 1000); // עיכוב קל להצגת הודעת הצלחה
-      } else {
-        setError("Login failed");
       }
-    } catch {
-      setError("An error occurred while connecting to the server");
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        setError("Login failed: Invalid username or password");
+      } else {
+        setError("An error occurred while connecting to the server");
+      }
     }
   };
 
@@ -87,4 +87,3 @@ const Login = () => {
 };
 
 export default Login;
-
