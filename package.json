@@ -12,5 +12,11 @@
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^9.1.0"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.4.0",
+    "react-router-dom": "^7.1.1"
   }
 }
