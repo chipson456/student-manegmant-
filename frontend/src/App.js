@@ -6,14 +6,15 @@ import ForgotPassword from "./copms/ForgotPassword";
 import StudentProjects from "./copms/StudentProjects";
 import HomePage from "./copms/HomePage";
 
-
 function App() {
+  console.log("ggg");
+
   return (
     <Router>
       <NavBar />
       <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<Login />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/student-projects" element={<StudentProjects />} />
       </Routes>
@@ -22,4 +23,3 @@ function App() {
 }
 
 export default App;
-
