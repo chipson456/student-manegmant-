@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"npm start --prefix backend\" \"npm start --prefix frontend\"",
-    "install-all": "npm install --prefix backend && npm install --prefix frontend"
+    "install-all": "npm install --prefix backend && npm install --prefix frontend", 
+    "add-admin": "node addAdmin.js"
   },
   "keywords": [],
   "author": "",

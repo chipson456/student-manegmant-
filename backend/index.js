@@ -9,6 +9,7 @@ import authRoutes from './routes/auth.js';
 import uploadRoutes from './routes/upload.js';
 import dotenv from 'dotenv';
 
+
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -31,11 +32,15 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
 }
 
+
+
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use('/uploads', express.static(uploadsDir));
 
-app.use('/auth', authRoutes);
+app.use('/api', authRoutes);
+app.use('/api', authRoutes)
 app.use('/api/upload', uploadRoutes);
 
 const PORT = process.env.PORT || 5000;
