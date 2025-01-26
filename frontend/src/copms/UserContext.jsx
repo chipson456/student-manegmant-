@@ -20,9 +20,11 @@ export const UserProvider = ({ children }) => {
   const updateUserInfo = (token) => {
     if (token) {
       const decoded = JSON.parse(atob(token.split(".")[1]));
-      setUserInfo({ ...decoded, token });
+      setUserInfo({ ...decoded, token }); // עדכון המידע ב-context
       localStorage.setItem("token", token);
-
+  
+      console.log("User info updated:", decoded); // דיבוג: בדוק אם המידע מתעדכן
+  
       // הגדרת התנתקות אוטומטית לפי תוקף הטוקן
       const expirationTime = decoded.exp * 1000 - Date.now();
       setTimeout(() => {
@@ -31,10 +33,12 @@ export const UserProvider = ({ children }) => {
         alert("הטוקן פקע, אנא התחבר מחדש.");
       }, expirationTime);
     } else {
+      console.log("User logged out"); // דיבוג
       setUserInfo(null);
       localStorage.removeItem("token");
     }
   };
+  
 
   return (
     <UserContext.Provider value={{ userInfo, updateUserInfo }}>
